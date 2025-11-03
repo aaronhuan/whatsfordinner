@@ -24,8 +24,8 @@ sealed class Routes(val route: String) {
     data object Add : Routes("add")
     data object Settings : Routes("settings")
     data object Detail : Routes("detail/{recipeId}") {
-        const val ARG = "recipeId"
-        fun create(recipeId: String) = "detail/$recipeId"
+        const val ARG = "recipeId" // Name of the argument
+        fun create(recipeId: String) = "detail/$recipeId"// Helper to build actual route
     }
 }
 
@@ -57,9 +57,8 @@ fun RecipeApp(vm: RecipeVM) {
             composable(Routes.Add.route) {
                 AddScreen(
                     vm = vm,
-                    onRecipeAdded = {
-                        navController.navigate(Routes.Home.route) {
-                            // Clear to a clean Home and keep tab state healthy
+                    onRecipeAdded = {//helper function to call when a recipe is called
+                        navController.navigate(Routes.Home.route) { // go to the home screen
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -96,7 +95,7 @@ private fun BottomNav(navController: NavHostController) {
     NavigationBar {
         items.forEach { route ->
             // Highlight Home when on a detail page
-            val selected = when (route) {
+            val selected = when (route) { //if the route is selected
                 is Routes.Home ->
                     currentRoute == Routes.Home.route || (currentRoute?.startsWith("detail/") == true)
                 else -> currentRoute == route.route
@@ -108,23 +107,22 @@ private fun BottomNav(navController: NavHostController) {
                     when (route) {
                         is Routes.Home -> {
                             navController.navigate(Routes.Home.route) {
-                                // Nuke any Detail above Home and re-create Home fresh
-                                popUpTo(Routes.Home.route) { inclusive = true }
-                                launchSingleTop = true
+                                popUpTo(Routes.Home.route) { inclusive = true } // remove everything including home
+                                launchSingleTop = true//prevent dupes
                             }
                         }
                         else -> {
                             navController.navigate(route.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    saveState = true //save the previous UI state of the destination
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+                                restoreState = true //restores previous state of destination  ( remebers it like what u types/scrolled to)
                             }
                         }
                     }
                 },
-                icon = { /* add icons if you want */ },
+                icon = { },
                 label = {
                     Text(
                         when (route) {
